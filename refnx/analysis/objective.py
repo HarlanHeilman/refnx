@@ -908,7 +908,7 @@ class Objective(BaseObjective):
         finally:
             self.setp(saved_params)
 
-    def plot(self, pvals=None, samples=0, parameter=None, fig=None):
+    def plot(self, pvals=None, samples=0, parameter=None, fig=None, resid=False):
         """
         Plot the data/model.
 
@@ -940,9 +940,18 @@ class Objective(BaseObjective):
             import matplotlib.pyplot as plt
 
             fig = plt.figure()
-            ax = fig.add_subplot(111)
+            if resid:
+                ax = fig.add_subplot(211)
+                ax2 = fig.add_subplot(212, sharex=ax)
+                fig.subplots_adjust(hspace=0)
+            else:
+                ax = fig.add_subplot(111)
         else:
-            ax = fig.gca()
+            if resid:
+                ax = fig.gca()
+                ax2 = fig.add_subplot(212)
+            else:
+                ax = fig.gca()
 
         y, y_err, model = self._data_transform(model=self.generative())
 
@@ -952,7 +961,7 @@ class Objective(BaseObjective):
                 self.data.x,
                 y,
                 y_err,
-                color="blue",
+                color="C0",
                 label=self.data.name,
                 marker="o",
                 ms=3,
@@ -960,7 +969,7 @@ class Objective(BaseObjective):
                 elinewidth=2,
             )
         else:
-            ax.scatter(self.data.x, y, color="blue", s=3, label=self.data.name)
+            ax.scatter(self.data.x, y, color="C0", s=3, label=self.data.name)
 
         if samples > 0:
             # Get a number of chains, chosen randomly, set the objective,
@@ -971,7 +980,12 @@ class Objective(BaseObjective):
                 ax.plot(self.data.x, model, color="k", alpha=0.01)
 
         # add the fit
-        generative_plot = ax.plot(self.data.x, model, color="red", zorder=20)
+        generative_plot = ax.plot(self.data.x, model, color="C1", zorder=20)
+        if resid:
+            ax2.plot(self.residuals(), color="C2", zorder=20)
+            ax2.set(
+
+            )
 
         if parameter is None:
             return fig, ax
