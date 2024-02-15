@@ -932,13 +932,13 @@ class Objective(BaseObjective):
         if fig is None:
             import matplotlib.pyplot as plt
 
-            fig = plt.figure()
+
             if resid:
-                ax = fig.add_subplot(211)
-                ax2 = fig.add_subplot(212, sharex=ax)
-                fig.subplots_adjust(hspace=0)
-                ax2.set_aspect(1/2)
+                fig, ax_ = plt.subplots(2, 1, sharex=True, gridspec_kw={'height_ratios': [3, 1], "hspace": 0})
+                ax = ax_[0]
+                ax2 = ax_[1]
             else:
+                fig = plt.figure()
                 ax = fig.add_subplot(111)
         else:
             if resid:
