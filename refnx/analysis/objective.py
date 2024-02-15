@@ -975,7 +975,7 @@ class Objective(BaseObjective):
         # add the fit
         generative_plot = ax.plot(self.data.x, model, color="C1", zorder=20)
         if resid:
-            ax2.plot(self.residuals(), self.data.x, color="C2", zorder=20)
+            ax2.plot(self.data.x, self.residuals(), color="C2", zorder=20)
             ax2.set()
 
         if parameter is None:
