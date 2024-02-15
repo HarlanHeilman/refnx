@@ -937,6 +937,7 @@ class Objective(BaseObjective):
                 ax = fig.add_subplot(211)
                 ax2 = fig.add_subplot(212, sharex=ax)
                 fig.subplots_adjust(hspace=0)
+                ax2.set_aspect(1/2)
             else:
                 ax = fig.add_subplot(111)
         else:
@@ -976,7 +977,10 @@ class Objective(BaseObjective):
         generative_plot = ax.plot(self.data.x, model, color="C1", zorder=20)
         if resid:
             ax2.plot(self.data.x, self.residuals(), color="C2", zorder=20)
-            ax2.set()
+            ax2.set(
+                "xlabel": "Q[$\AA$]",
+                "ylabel": "Residuals"
+            )
 
         if parameter is None:
             return fig, ax
