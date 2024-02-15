@@ -934,7 +934,7 @@ class Objective(BaseObjective):
 
 
             if resid:
-                fig, ax_ = plt.subplots(2, 1, sharex=True, gridspec_kw={'height_ratios': [3, 1], "hspace": 0})
+                fig, ax_ = plt.subplots(2, 1, sharex=True, gridspec_kw={'height_ratios': [3, 1], "hspace": 0.2})
                 ax = ax_[0]
                 ax2 = ax_[1]
             else:
