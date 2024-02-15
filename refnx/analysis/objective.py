@@ -977,10 +977,8 @@ class Objective(BaseObjective):
         generative_plot = ax.plot(self.data.x, model, color="C1", zorder=20)
         if resid:
             ax2.plot(self.data.x, self.residuals(), color="C2", zorder=20)
-            ax2.set(
-                "xlabel": "Q[$\AA$]",
-                "ylabel": "Residuals"
-            )
+            ax2.set_xlabel("Q / $\AA^{-1}$")
+            ax2.set_ylabel("Residuals")
 
         if parameter is None:
             return fig, ax
