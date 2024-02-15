@@ -1,23 +1,24 @@
 import warnings
+
 import numpy as np
+import scipy.stats as stats
 from numpy.linalg import LinAlgError
 from scipy.linalg import LinAlgWarning
 from scipy.optimize._numdiff import approx_derivative
-import scipy.stats as stats
 
-from refnx.util import ErrorProp as EP
-from refnx._lib import flatten, approx_hess2
+from refnx._lib import approx_hess2, flatten
 from refnx._lib import unique as f_unique
-from refnx.dataset import Data1D
 from refnx.analysis import (
-    is_parameter,
-    Parameter,
-    possibly_create_parameter,
-    is_parameters,
-    Parameters,
-    Interval,
     PDF,
+    Interval,
+    Parameter,
+    Parameters,
+    is_parameter,
+    is_parameters,
+    possibly_create_parameter,
 )
+from refnx.dataset import Data1D
+from refnx.util import ErrorProp as EP
 
 
 class BaseObjective:
@@ -605,9 +606,7 @@ class Objective(BaseObjective):
         logp = np.sum(
             [
                 param.logp()
-                for param in f_unique(
-                    p for p in flatten(self.parameters) if p.vary
-                )
+                for param in f_unique(p for p in flatten(self.parameters) if p.vary)
             ]
         )
 
@@ -661,9 +660,7 @@ class Objective(BaseObjective):
         y, y_err, model = self._data_transform(model)
 
         if self.lnsigma is not None:
-            var_y = (
-                y_err * y_err + np.exp(2 * float(self.lnsigma)) * model * model
-            )
+            var_y = y_err * y_err + np.exp(2 * float(self.lnsigma)) * model * model
         else:
             var_y = y_err**2
 
@@ -839,9 +836,7 @@ class Objective(BaseObjective):
         scale = 1.0
         # scale by reduced chi2 if experimental uncertainties weren't used.
         if not (self.weighted):
-            scale = self.chisqr() / (
-                n_datapoints - len(self.varying_parameters())
-            )
+            scale = self.chisqr() / (n_datapoints - len(self.varying_parameters()))
 
         return covar * scale
 
@@ -872,9 +867,7 @@ class Objective(BaseObjective):
             ngen=ngen, nburn=nburn, nthin=nthin, random_state=random_state
         )
 
-    def _generate_generative_mcmc(
-        self, ngen=1000, nburn=0, nthin=1, random_state=None
-    ):
+    def _generate_generative_mcmc(self, ngen=1000, nburn=0, nthin=1, random_state=None):
         """
         Yield generative curves from the MCMC samples. The objective state
         is altered during generation, but should be restored when the
@@ -982,10 +975,8 @@ class Objective(BaseObjective):
         # add the fit
         generative_plot = ax.plot(self.data.x, model, color="C1", zorder=20)
         if resid:
-            ax2.plot(self.residuals(), color="C2", zorder=20)
-            ax2.set(
-
-            )
+            ax2.plot(self.residuals(), self.data.x, color="C2", zorder=20)
+            ax2.set()
 
         if parameter is None:
             return fig, ax
@@ -1287,9 +1278,7 @@ class GlobalObjective(Objective):
 
         for objective in self.objectives:
             # add the data (in a transformed fashion)
-            y, y_err, model = objective._data_transform(
-                model=objective.generative()
-            )
+            y, y_err, model = objective._data_transform(model=objective.generative())
 
             if objective.weighted:
                 ax.errorbar(
@@ -1307,9 +1296,7 @@ class GlobalObjective(Objective):
 
             # add the fit
             generative_plots.append(
-                ax.plot(objective.data.x, model, color="r", lw=1.5, zorder=20)[
-                    0
-                ]
+                ax.plot(objective.data.x, model, color="r", lw=1.5, zorder=20)[0]
             )
 
         if parameter is None:
@@ -1488,6 +1475,7 @@ def pymc_model(objective):
     """
     import pymc as pm
     import pytensor.tensor as pt
+
     from refnx._lib._pymc import _LogLikeWithGrad
 
     basic_model = pm.Model()
@@ -1545,11 +1533,7 @@ def _to_pymc_distribution(name, par):
     if isinstance(dist, Interval) and np.isfinite([dist.lb, dist.ub]).all():
         return pm.Uniform(name, dist.lb, dist.ub)
     # no bounds
-    elif (
-        isinstance(dist, Interval)
-        and np.isneginf(dist.lb)
-        and np.isinf(dist.lb)
-    ):
+    elif isinstance(dist, Interval) and np.isneginf(dist.lb) and np.isinf(dist.lb):
         return pm.Flat(name)
     # half open uniform
     elif isinstance(dist, Interval) and not np.isfinite(dist.lb):
@@ -1567,9 +1551,7 @@ def _to_pymc_distribution(name, par):
 
         if isinstance(dist_gen, type(stats.uniform)):
             if hasattr(dist.rv, "args"):
-                p = pm.Uniform(
-                    name, dist.rv.args[0], dist.rv.args[1] + dist.rv.args[0]
-                )
+                p = pm.Uniform(name, dist.rv.args[0], dist.rv.args[1] + dist.rv.args[0])
             else:
                 p = pm.Uniform(name, 0, 1)
             return p
